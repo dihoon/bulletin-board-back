@@ -51,4 +51,10 @@ public class UserService implements UserDetailsService {
                 .role(role)
                 .build()).getId();
     }
+
+    public void updateRefreshToken(String email, String refreshToken) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+    }
 }

@@ -21,6 +21,7 @@ springdoc:
     path: /api-docs
     groups:
       enabled: true
+  show-login-endpoint: true
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
@@ -32,3 +33,9 @@ springdoc:
   cache:
     disabled: true
   model-and-view-allowed: true
+jwt:
+  issuer: ${JWT_ISSUER}
+  access-key: ${JWT_ACCESS_KEY}
+  access-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-key: ${JWT_REFRESH_KEY}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
