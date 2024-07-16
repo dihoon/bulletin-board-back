@@ -1,5 +1,6 @@
 package dihoon.bulletinboardback.controller;
 
+import dihoon.bulletinboardback.api.UserApi;
 import dihoon.bulletinboardback.dto.AddUserRequest;
 import dihoon.bulletinboardback.dto.LoginRequest;
 import dihoon.bulletinboardback.dto.LoginResponse;
@@ -7,12 +8,16 @@ import dihoon.bulletinboardback.exception.InvalidEmailException;
 import dihoon.bulletinboardback.exception.UserAlreadyExistsException;
 import dihoon.bulletinboardback.jwt.TokenProvider;
 import dihoon.bulletinboardback.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +29,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,12 +36,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
-public class UserApiController {
+public class UserApiController implements UserApi {
     private final UserService userService;
     private final TokenProvider tokenProvider;
 
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestBody AddUserRequest request) {
+    public ResponseEntity signUp(AddUserRequest request) {
         try {
             userService.save(request);
         } catch (InvalidEmailException e) {
@@ -51,16 +55,10 @@ public class UserApiController {
     }
 
     @PostMapping("/login")
-    @Parameters( value = { @Parameter(name = "request", hidden = true), @Parameter(name = "request", hidden = true)})
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "login request payload",
-            required = true, content = @Content(schema = @Schema(implementation = LoginRequest.class),
-            examples = { @ExampleObject(value = "{ \"email\" : \"test@gmail.com\", \"password\" : \"1234\"}")}))
     public ResponseEntity login( HttpServletRequest request, HttpServletResponse response) {
         try {
             Authentication authResult = (Authentication) request.getAttribute("authResult");
             UserDetails userDetails = (UserDetails) authResult.getPrincipal();
-
-            System.out.println(authResult);
 
             String email = userDetails.getUsername();
 
@@ -88,4 +86,6 @@ public class UserApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(loginResponse);
         }
     }
+
+
 }

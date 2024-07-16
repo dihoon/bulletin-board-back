@@ -84,10 +84,10 @@ public class TokenProvider {
 
         Cookie cookie = new Cookie(tokenType, token);
         cookie.setPath(path);
-        cookie.setHttpOnly(true);
+//        cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
         cookie.setMaxAge(expiration);
-        cookie.setDomain("localhost");
+//        cookie.setDomain("localhost");
 
         return cookie;
     }
