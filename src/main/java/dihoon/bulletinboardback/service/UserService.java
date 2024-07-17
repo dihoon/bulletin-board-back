@@ -52,6 +52,10 @@ public class UserService implements UserDetailsService {
                 .build()).getId();
     }
 
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
     public void updateRefreshToken(String email, String refreshToken) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         user.setRefreshToken(refreshToken);

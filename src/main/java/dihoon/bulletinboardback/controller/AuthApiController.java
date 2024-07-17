@@ -2,6 +2,7 @@ package dihoon.bulletinboardback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dihoon.bulletinboardback.api.AuthApi;
+import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddUserRequest;
 import dihoon.bulletinboardback.dto.LoginResponse;
 import dihoon.bulletinboardback.exception.InvalidEmailException;
@@ -90,20 +91,25 @@ public class AuthApiController implements AuthApi {
 
                 UserDetails userDetails = userService.loadUserByUsername(email);
 
-                String newAccessToken = tokenProvider.generateAccessToken(email);
+                String orignRefreshToken = userService.findByEmail(email).getRefreshToken();
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
+                if (refreshToken.equals(orignRefreshToken) && tokenProvider.validateToken(refreshToken, tokenProvider.getRefreshSecretKey())) {
+                    String newAccessToken = tokenProvider.generateAccessToken(email);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
 
-                ObjectMapper objectMapper = new ObjectMapper();
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                Map<String, String> map = new HashMap<>();
-                map.put("accessToken", newAccessToken);
+                    ObjectMapper objectMapper = new ObjectMapper();
 
-                String response = objectMapper.writeValueAsString(map);
+                    Map<String, String> map = new HashMap<>();
+                    map.put("accessToken", newAccessToken);
 
-                return ResponseEntity.ok().body(response);
+                    String response = objectMapper.writeValueAsString(map);
+
+                    return ResponseEntity.ok().body(response);
+                }
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("refresh token is missing");
         } catch (UsernameNotFoundException e) {
