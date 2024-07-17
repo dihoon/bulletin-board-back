@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -89,5 +90,34 @@ public class TokenProvider {
         cookie.setMaxAge(expiration);
 
         return cookie;
+    }
+
+    public static String extractJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    public static String extractRefreshTokenFromRequest(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refreshToken")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Cookie resetCookie(Cookie cookie) {
+        String name = cookie.getName();
+        Cookie newCookie = new Cookie(name, null);
+        newCookie.setPath("/api/auth");
+        newCookie.setMaxAge(0);
+        newCookie.setHttpOnly(true);
+        return newCookie;
     }
 }

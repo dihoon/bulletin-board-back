@@ -5,7 +5,6 @@ import dihoon.bulletinboardback.jwt.TokenProvider;
 import dihoon.bulletinboardback.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String accessToken = extractJwtFromRequest(request);
+            String accessToken = tokenProvider.extractJwtFromRequest(request);
 
             if (accessToken != null && tokenProvider.validateToken(accessToken, tokenProvider.getAccessSecretKey())) {
                 String email = tokenProvider.getClaims(accessToken, tokenProvider.getAccessSecretKey()).get("email", String.class);
@@ -54,31 +52,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("An error occurred processing the authentication token");
         }
-    }
-
-//    private void refreshAccessToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        String refreshToken = extractRefreshTokenFromRequest(request);
-//        if (refreshToken != null && tokenProvider.validateToken(refreshToken, tokenProvider.getRefreshSecretKey())) {
-//            String email = tokenProvider.getClaims(refreshToken, tokenProvider.getAccessSecretKey()).get("email", String.class);
-//            UserDetails userDetails = userService.loadUserByUsername(email);
-//
-//            String newAccessToken = tokenProvider.generateAccessToken(email);
-//
-//            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            filterChain.doFilter(request, response);
-//        } else {
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//        }
-//    }
-
-    private String extractJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        logger.info("Bearer token: " + bearerToken);
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 }

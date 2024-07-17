@@ -41,6 +41,9 @@ public interface AuthApi {
                     headers = @Header(name = "Set-Cookie", description = "refreshToken", schema = @Schema(type = "string")))})
     ResponseEntity login(HttpServletRequest request, HttpServletResponse response);
 
-    @Operation(summary = "액세스 토큰 재발급", security = { @SecurityRequirement(name = "bearerToken")})
+    @Operation(summary = "액세스 토큰 재발급", security = { @SecurityRequirement(name = "accessToken")})
     ResponseEntity refreshAccessToken(HttpServletRequest request);
+
+    @Operation(summary = "로그아웃", security = { @SecurityRequirement(name = "accessToken")})
+    ResponseEntity logout(HttpServletRequest request, HttpServletResponse response);
 }

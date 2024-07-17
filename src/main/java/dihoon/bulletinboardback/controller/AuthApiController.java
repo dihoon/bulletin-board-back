@@ -67,7 +67,7 @@ public class AuthApiController implements AuthApi {
 
             userService.updateRefreshToken(email, refreshToken);
 
-            Cookie refreshTokenCookie = tokenProvider.generateCookie(refreshToken, tokenProvider.getRefreshSecretKey(), "/api/auth/refresh");
+            Cookie refreshTokenCookie = tokenProvider.generateCookie(refreshToken, tokenProvider.getRefreshSecretKey(), "/api/auth");
 
             response.addCookie(refreshTokenCookie);
 
@@ -81,10 +81,15 @@ public class AuthApiController implements AuthApi {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.status(HttpStatus.OK).body("Logout Successful");
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity refreshAccessToken(HttpServletRequest request) {
         try {
-            String refreshToken = extractRefreshTokenFromRequest(request);
+            String refreshToken = TokenProvider.extractRefreshTokenFromRequest(request);
 
             if (refreshToken != null) {
                 String email = tokenProvider.getClaims(refreshToken, tokenProvider.getRefreshSecretKey()).get("email", String.class);
@@ -118,17 +123,4 @@ public class AuthApiController implements AuthApi {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-    private String extractRefreshTokenFromRequest(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("refreshToken")) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
-
 }
