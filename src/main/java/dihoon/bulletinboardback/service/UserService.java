@@ -1,6 +1,6 @@
 package dihoon.bulletinboardback.service;
 
-import dihoon.bulletinboardback.constant.ROLE;
+import dihoon.bulletinboardback.constant.Role;
 import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddUserRequest;
 import dihoon.bulletinboardback.exception.InvalidEmailException;
@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
     public long save(AddUserRequest request) {
         String email = request.getEmail();
         String password = request.getPassword();
-        String role = request.getRole() == null ? ROLE.USER.name() : request.getRole();
+        String role = request.getRole() == null ? Role.USER.name() : request.getRole();
 
         if (!EmailValidator.isValidEmail(email)) {
             throw new InvalidEmailException("Invalid email");

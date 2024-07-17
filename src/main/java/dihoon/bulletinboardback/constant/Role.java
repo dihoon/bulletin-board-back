@@ -1,5 +1,5 @@
 package dihoon.bulletinboardback.constant;
 
-public enum ROLE {
+public enum Role {
     USER
 }

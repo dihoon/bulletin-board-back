@@ -1,34 +1,9 @@
 package dihoon.bulletinboardback.controller;
 
 import dihoon.bulletinboardback.api.UserApi;
-import dihoon.bulletinboardback.dto.AddUserRequest;
-import dihoon.bulletinboardback.dto.LoginRequest;
-import dihoon.bulletinboardback.dto.LoginResponse;
-import dihoon.bulletinboardback.exception.InvalidEmailException;
-import dihoon.bulletinboardback.exception.UserAlreadyExistsException;
-import dihoon.bulletinboardback.jwt.TokenProvider;
 import dihoon.bulletinboardback.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,54 +13,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/user")
 public class UserApiController implements UserApi {
     private final UserService userService;
-    private final TokenProvider tokenProvider;
-
-    @PostMapping("/sign-up")
-    public ResponseEntity signUp(AddUserRequest request) {
-        try {
-            userService.save(request);
-        } catch (InvalidEmailException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (UserAlreadyExistsException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.CONFLICT);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity login( HttpServletRequest request, HttpServletResponse response) {
-        try {
-            Authentication authResult = (Authentication) request.getAttribute("authResult");
-            UserDetails userDetails = (UserDetails) authResult.getPrincipal();
-
-            String email = userDetails.getUsername();
-
-            String accessToken = tokenProvider.generateAccessToken(email);
-
-            String message = "Login Successful";
-
-            LoginResponse loginResponse = new LoginResponse(true, message, accessToken);
-
-            String refreshToken = tokenProvider.generateRefreshToken(email);
-
-            userService.updateRefreshToken(email, refreshToken);
-
-            Cookie refreshTokenCookie = tokenProvider.generateCookie(refreshToken, tokenProvider.getRefreshSecretKey(), "/api/auth");
-
-            response.addCookie(refreshTokenCookie);
-
-            return ResponseEntity.ok().body(loginResponse);
-        } catch (AuthenticationException e) {
-            LoginResponse loginResponse = new LoginResponse(false, e.getMessage(), null);
-            System.out.println(loginResponse);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(loginResponse);
-        } catch (Exception e) {
-            LoginResponse loginResponse = new LoginResponse(false, e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(loginResponse);
-        }
-    }
-
-
 }

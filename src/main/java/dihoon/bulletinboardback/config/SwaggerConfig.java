@@ -11,8 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @SecuritySchemes({
-        @SecurityScheme(name = "bearerToken", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT"),
-        @SecurityScheme(name = "cookie", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER, paramName = "cookie")
+        @SecurityScheme(name = "accessToken", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT", paramName = "accessToken"),
 })
 @Configuration
 public class SwaggerConfig {

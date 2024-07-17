@@ -1,6 +1,8 @@
 package dihoon.bulletinboardback.config;
 
+import dihoon.bulletinboardback.constant.PublicUrl;
 import dihoon.bulletinboardback.filter.CustomUsernamePasswordAuthenticationFilter;
+import dihoon.bulletinboardback.filter.JwtAuthenticationFilter;
 import dihoon.bulletinboardback.jwt.TokenProvider;
 import dihoon.bulletinboardback.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +28,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/", "/api/user/login", "/api/user/sign-up", "/error", "/swagger-ui/**", "/api-docs/**").permitAll()
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(PublicUrl.getUrls()).permitAll()
                         .anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(login->login.disable())
-                .addFilterBefore(new CustomUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new CustomUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(tokenProvider, userService), CustomUsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -52,11 +55,10 @@ public class SecurityConfig {
     @Bean
     public CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter () throws Exception {
         CustomUsernamePasswordAuthenticationFilter filter = new CustomUsernamePasswordAuthenticationFilter();
-        filter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/user/login", "POST"));
-        filter.setFilterProcessesUrl("/api/user/login");
+        filter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(PublicUrl.LOGIN.getUrl(), "POST"));
+        filter.setFilterProcessesUrl(PublicUrl.LOGIN.getUrl());
         filter.setUsernameParameter("email");
         filter.setAuthenticationManager(authenticationManager());
-//        filter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
         return filter;
     }
 }
