@@ -3,6 +3,8 @@ package dihoon.bulletinboardback.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -11,19 +13,19 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", unique = true, nullable = false)
-    private long id;
+    @Column(unique = true, nullable = false)
+    private long userId;
 
-    @Column(name= "email", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name= "password", unique = false, nullable = true)
+    @Column(unique = false, nullable = true)
     private String password;
 
-    @Column(name = "role", nullable = false)
+    @Column(nullable = false)
     private String role;
 
-    @Column(name = "refreshToken")
+    @Column()
     private String refreshToken;
 
     @Builder
@@ -33,4 +35,7 @@ public class User {
         this.role = role;
         this.refreshToken = refreshToken;
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 }

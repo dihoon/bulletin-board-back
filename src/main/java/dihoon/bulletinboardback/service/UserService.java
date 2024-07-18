@@ -49,7 +49,7 @@ public class UserService implements UserDetailsService {
                 .email(email)
                 .password(new BCryptPasswordEncoder().encode(password))
                 .role(role)
-                .build()).getId();
+                .build()).getUserId();
     }
 
     public User findByEmail(String email) {

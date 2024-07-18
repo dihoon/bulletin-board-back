@@ -5,7 +5,7 @@ import java.util.Arrays;
 public enum PublicUrl {
     ROOT("/"),
     LOGIN("/api/auth/login"),
-    SIGN_UP("/api/auth/signup"),
+    SIGN_UP("/api/auth/sign-up"),
     ERROR("/error"),
     SWAGGER_UI("/swagger-ui/**"),
     API_DOCS("/api-docs/**"),

@@ -5,6 +5,7 @@ import dihoon.bulletinboardback.api.AuthApi;
 import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddUserRequest;
 import dihoon.bulletinboardback.dto.LoginResponse;
+import dihoon.bulletinboardback.dto.SignUpResponse;
 import dihoon.bulletinboardback.exception.InvalidEmailException;
 import dihoon.bulletinboardback.exception.UserAlreadyExistsException;
 import dihoon.bulletinboardback.jwt.TokenProvider;
@@ -46,7 +47,7 @@ public class AuthApiController implements AuthApi {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SignUpResponse("User registered successfully"));
     }
 
     @PostMapping("/login")
