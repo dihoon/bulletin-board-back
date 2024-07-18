@@ -9,7 +9,8 @@ public enum PublicUrl {
     ERROR("/error"),
     SWAGGER_UI("/swagger-ui/**"),
     API_DOCS("/api-docs/**"),
-    REFRESH("/api/auth/refresh");
+    REFRESH("/api/auth/refresh"),
+    GETPOST("/api/posts/{postId}");
 
     private final String url;
 

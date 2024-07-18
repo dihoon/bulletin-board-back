@@ -11,4 +11,7 @@ public interface PostApi {
 
     @Operation(summary = "게시글 생성", security = { @SecurityRequirement(name = "accessToken")})
     ResponseEntity createPost(AddPostRequest post);
+
+    @Operation(summary = "게시글 조회")
+    ResponseEntity getPostById (long postId);
 }

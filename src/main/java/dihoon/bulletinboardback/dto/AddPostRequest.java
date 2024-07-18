@@ -10,5 +10,4 @@ import lombok.Setter;
 public class AddPostRequest {
     private final String title;
     private final String content;
-    private final long userId;
 }

@@ -1,5 +1,6 @@
 package dihoon.bulletinboardback.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,13 +24,14 @@ public class Post {
     private String content;
 
     @Column(nullable = false,  updatable = false, scale = 0)
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @JoinColumn(name = "user_id" ,nullable = false)
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User user;
 
     @Builder
@@ -41,7 +43,7 @@ public class Post {
 
     @PrePersist
     public void prePersist() {
-        this.createAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
