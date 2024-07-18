@@ -20,4 +20,7 @@ public interface PostApi {
 
     @Operation(summary = "게시글 업데이트", security = { @SecurityRequirement(name = "accessToken")})
     ResponseEntity updatePost(@PathVariable long postId, @RequestBody UpdatePostRequest request);
+
+    @Operation(summary = "게시글 삭제", security = { @SecurityRequirement(name = "accessToken")})
+    ResponseEntity deletePost(@PathVariable long postId);
 }

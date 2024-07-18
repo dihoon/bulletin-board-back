@@ -47,6 +47,27 @@ public class PostService {
 
     @Transactional
     public Post updatePost(long postId, UpdatePostRequest updateData) {
+        if (!isAuthorizedToAccessPost(postId)) throw new UnauthorizedAccessException("User not authorized to update this post");
+
+        Post post = getPostById(postId);
+
+        post.setContent(updateData.getContent());
+        postRepository.save(post);
+        return post;
+    }
+
+    @Transactional
+    public long deletePost(long postId) {
+        if (!isAuthorizedToAccessPost(postId)) throw new UnauthorizedAccessException("User not authorized to delete this post");
+
+        if (!postRepository.existsById(postId)) throw new PostNotFoundException("Post not found");
+
+        postRepository.deleteById(postId);
+
+        return postId;
+    }
+
+    private boolean isAuthorizedToAccessPost(long postId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
 
@@ -55,11 +76,7 @@ public class PostService {
 
         Post post = getPostById(postId);
 
-        if (user.getUserId() != post.getUser().getUserId()) throw new UnauthorizedAccessException("User not authorized to update this post");
-
-        post.setContent(updateData.getContent());
-        postRepository.save(post);
-        return post;
+        return user.getUserId() == post.getUser().getUserId();
     }
 
 }

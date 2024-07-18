@@ -7,6 +7,7 @@ import dihoon.bulletinboardback.dto.ApiResponse;
 import dihoon.bulletinboardback.dto.UpdatePostRequest;
 import dihoon.bulletinboardback.exception.PostNotFoundException;
 import dihoon.bulletinboardback.exception.TitleNotFoundException;
+import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
 import dihoon.bulletinboardback.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,6 +53,23 @@ public class PostApiController implements PostApi {
             Post post = postService.updatePost(postId, request);
             ApiResponse response = new ApiResponse("Post updated successfully", post);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity deletePost(@PathVariable long postId) {
+        try {
+            long deletedPostId = postService.deletePost(postId);
+
+            ApiResponse response = new ApiResponse("Post deleted successfully", deletedPostId);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (UnauthorizedAccessException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (PostNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
