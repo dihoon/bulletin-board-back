@@ -15,7 +15,8 @@ public enum PublicUrl {
     SWAGGER_UI("/swagger-ui/**"),
     API_DOCS("/api-docs/**"),
     REFRESH("/api/auth/refresh"),
-    GETPOST("GET", "/api/posts/{postId}");
+    GETPOST("GET", "/api/posts/{postId}"),
+    GETPOSTS("GET", "/api/posts/**");
 
     private final String httpMethod;
     private final String url;
@@ -36,16 +37,6 @@ public enum PublicUrl {
 
     public String getUrl() {
         return url;
-    }
-
-    public static List<String> getUrls() {
-        return Arrays.stream(PublicUrl.values()).map(value -> value.getUrl()).collect(Collectors.toList());
-    }
-
-    public static List<String[]> getValues() {
-        return Arrays.stream(PublicUrl.values())
-                .map(publicUrl -> new String[]{publicUrl.getHttpMethod(), publicUrl.getUrl()})
-                .collect(Collectors.toList());
     }
 
     public static List<RequestMatcher> getRequestMatchers() {

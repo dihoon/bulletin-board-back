@@ -2,7 +2,6 @@ package dihoon.bulletinboardback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dihoon.bulletinboardback.api.AuthApi;
-import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddUserRequest;
 import dihoon.bulletinboardback.dto.LoginResponse;
 import dihoon.bulletinboardback.dto.SignUpResponse;

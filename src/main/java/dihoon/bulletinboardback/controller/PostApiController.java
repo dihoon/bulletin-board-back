@@ -10,9 +10,13 @@ import dihoon.bulletinboardback.exception.TitleNotFoundException;
 import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
 import dihoon.bulletinboardback.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
@@ -42,6 +46,17 @@ public class PostApiController implements PostApi {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (PostNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/")
+    public ResponseEntity getAllPosts(Pageable pageable) {
+        try {
+            Page<Post> posts = postService.getAllPosts(pageable);
+            ApiResponse response = new ApiResponse("Posts retrieved successfully", posts);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

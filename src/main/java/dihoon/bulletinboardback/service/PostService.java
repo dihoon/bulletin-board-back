@@ -9,10 +9,14 @@ import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
 import dihoon.bulletinboardback.repository.PostRepository;
 import dihoon.bulletinboardback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -43,6 +47,11 @@ public class PostService {
     public Post getPostById(long postId) {
         Post post = postRepository.findById(postId).orElseThrow(()-> new PostNotFoundException("Post not found"));
         return post;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Post> getAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable);
     }
 
     @Transactional

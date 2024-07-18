@@ -5,6 +5,7 @@ import dihoon.bulletinboardback.dto.UpdatePostRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,9 @@ public interface PostApi {
 
     @Operation(summary = "게시글 조회")
     ResponseEntity getPostById (long postId);
+
+    @Operation(summary = "게시글 페이지네이션 조회")
+    ResponseEntity getAllPosts(Pageable pageable);
 
     @Operation(summary = "게시글 업데이트", security = { @SecurityRequirement(name = "accessToken")})
     ResponseEntity updatePost(@PathVariable long postId, @RequestBody UpdatePostRequest request);
