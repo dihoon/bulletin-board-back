@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -34,8 +35,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(PublicUrl.getUrls()).permitAll()
-                        .anyRequest().permitAll())
+        http.authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(PublicUrl.getRequestMatchers().toArray(new RequestMatcher[0])).permitAll();
+                    auth.anyRequest().authenticated();
+                })
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(login->login.disable())
                 .logout(logout -> logout

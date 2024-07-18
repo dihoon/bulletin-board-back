@@ -3,7 +3,9 @@ package dihoon.bulletinboardback.service;
 import dihoon.bulletinboardback.domain.Post;
 import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddPostRequest;
+import dihoon.bulletinboardback.dto.UpdatePostRequest;
 import dihoon.bulletinboardback.exception.PostNotFoundException;
+import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
 import dihoon.bulletinboardback.repository.PostRepository;
 import dihoon.bulletinboardback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,4 +44,22 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(()-> new PostNotFoundException("Post not found"));
         return post;
     }
+
+    @Transactional
+    public Post updatePost(long postId, UpdatePostRequest updateData) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        Post post = getPostById(postId);
+
+        if (user.getUserId() != post.getUser().getUserId()) throw new UnauthorizedAccessException("User not authorized to update this post");
+
+        post.setContent(updateData.getContent());
+        postRepository.save(post);
+        return post;
+    }
+
 }

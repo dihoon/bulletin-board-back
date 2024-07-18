@@ -26,10 +26,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            if (Arrays.stream(PublicUrl.getUrls()).anyMatch(pattern -> pathMatcher.match(pattern, request.getRequestURI()))) {
+            boolean isPublicUrl = PublicUrl.getRequestMatchers().stream().anyMatch(matcher -> matcher.matches(request));
+
+            if (isPublicUrl) {
                 filterChain.doFilter(request, response);
                 return;
             }
