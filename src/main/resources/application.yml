@@ -1,8 +1,12 @@
 server:
   port: 8000
+
 spring:
-  config:
-    import: optional:classpath:.env[.properties]
+  profiles:
+    active: dev
+---
+
+spring:
   application:
     name: bulletin-board-back
   security:
@@ -12,10 +16,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-  datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/bulletin_board
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+      show-sql: true
+    properties:
+      hibernate:
+
 springdoc:
   api-docs:
     path: /api-docs
@@ -39,3 +43,27 @@ jwt:
   access-expiration: ${JWT_ACCESS_EXPIRATION}
   refresh-key: ${JWT_REFRESH_KEY}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import: optional:classpath:.env[.properties]
+  datasource:
+    url: jdbc:mysql://${DEV_MYSQL_HOST:localhost}:3306/bulletin_board
+    username: ${DEV_MYSQL_USERNAME}
+    password: ${DEV_MYSQL_PASSWORD}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: optional:classpath:${user.home}.env[.properties]
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/mydb
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}

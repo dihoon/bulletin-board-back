@@ -10,13 +10,17 @@ import dihoon.bulletinboardback.repository.PostRepository;
 import dihoon.bulletinboardback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -50,8 +54,28 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> getAllPosts(Pageable pageable) {
+    public Page<Post> getAllPosts(int page, int size, String... sort) {
+        Sort criteria = Sort.by(parseSort(sort != null ? sort : new String[]{"createdAt,desc"}));
+        Pageable pageable = PageRequest.of(page, size, criteria);
+
         return postRepository.findAll(pageable);
+    }
+
+    private List<Sort.Order> parseSort(String[] sort) {
+        return Arrays.stream(sort)
+                .map(sortParam -> {
+                    String[] parts = sortParam.split(",");
+                    if (parts.length == 2 && parts[1].equalsIgnoreCase("desc")) {
+                        return Sort.Order.desc(parts[0]);
+                    } else if (parts.length == 2 && parts[1].equalsIgnoreCase("asc")) {
+                        return Sort.Order.asc(parts[0]);
+                    } else if (parts.length == 1) {
+                        return Sort.Order.asc(parts[0]);
+                    }
+                    return null;
+                })
+                .filter(order -> order != null)
+                .collect(Collectors.toList());
     }
 
     @Transactional

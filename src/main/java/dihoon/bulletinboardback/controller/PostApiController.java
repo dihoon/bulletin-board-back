@@ -52,9 +52,9 @@ public class PostApiController implements PostApi {
     }
 
     @GetMapping("/")
-    public ResponseEntity getAllPosts(Pageable pageable) {
+    public ResponseEntity getAllPosts(int page, int size, @RequestParam(required = false) String... sort) {
         try {
-            Page<Post> posts = postService.getAllPosts(pageable);
+            Page<Post> posts = postService.getAllPosts(page, size, sort);
             ApiResponse response = new ApiResponse("Posts retrieved successfully", posts);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
