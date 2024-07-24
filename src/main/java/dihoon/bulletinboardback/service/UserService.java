@@ -3,6 +3,7 @@ package dihoon.bulletinboardback.service;
 import dihoon.bulletinboardback.constant.Role;
 import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddUserRequest;
+import dihoon.bulletinboardback.dto.UserDto;
 import dihoon.bulletinboardback.exception.InvalidEmailException;
 import dihoon.bulletinboardback.exception.UserAlreadyExistsException;
 import dihoon.bulletinboardback.repository.UserRepository;
@@ -16,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,5 +66,13 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
+    }
+
+    public UserDto convertToUserDto(User user) {
+        return UserDto.builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .role(user.getEmail())
+                .build();
     }
 }

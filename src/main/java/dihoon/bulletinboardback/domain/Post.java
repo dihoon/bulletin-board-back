@@ -1,6 +1,6 @@
 package dihoon.bulletinboardback.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,7 +31,7 @@ public class Post {
 
     @JoinColumn(name = "user_id" ,nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonBackReference
     private User user;
 
     @Builder

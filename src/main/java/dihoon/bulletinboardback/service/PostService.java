@@ -3,6 +3,7 @@ package dihoon.bulletinboardback.service;
 import dihoon.bulletinboardback.domain.Post;
 import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddPostRequest;
+import dihoon.bulletinboardback.dto.PostDto;
 import dihoon.bulletinboardback.dto.UpdatePostRequest;
 import dihoon.bulletinboardback.exception.PostNotFoundException;
 import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -126,4 +126,15 @@ public class PostService {
         return user.getUserId() == post.getUser().getUserId();
     }
 
+    public PostDto convertToPostDto(Post post) {
+        return PostDto.builder()
+                .postId(post.getPostId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .userId(post.getUser().getUserId())
+                .userEmail(post.getUser().getEmail())
+                .build();
+    }
 }

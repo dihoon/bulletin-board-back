@@ -4,26 +4,17 @@ import dihoon.bulletinboardback.api.PostApi;
 import dihoon.bulletinboardback.domain.Post;
 import dihoon.bulletinboardback.dto.AddPostRequest;
 import dihoon.bulletinboardback.dto.ApiResponse;
+import dihoon.bulletinboardback.dto.PostDto;
 import dihoon.bulletinboardback.dto.UpdatePostRequest;
 import dihoon.bulletinboardback.exception.PostNotFoundException;
 import dihoon.bulletinboardback.exception.TitleNotFoundException;
 import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
 import dihoon.bulletinboardback.service.PostService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
@@ -49,7 +40,8 @@ public class PostApiController implements PostApi {
     public ResponseEntity getPostById(@PathVariable long postId) {
         try {
             Post post = postService.getPostById(postId);
-            ApiResponse response = new ApiResponse("Post retrieved successfully", post);
+            PostDto postDto = postService.convertToPostDto(post);
+            ApiResponse response = new ApiResponse("Post retrieved successfully", postDto);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (PostNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
