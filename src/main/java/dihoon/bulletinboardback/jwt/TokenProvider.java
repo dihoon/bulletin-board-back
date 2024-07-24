@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -75,7 +76,7 @@ public class TokenProvider {
         return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
     }
 
-    public Cookie generateCookie(String token, SecretKey key, String path) {
+    public ResponseCookie generateCookie(String token, SecretKey key, String path) {
         String tokenType = getClaims(token, key).get("tokenType").toString();
 
         int iat = getClaims(token, key).get("iat", Integer.class);
@@ -83,11 +84,13 @@ public class TokenProvider {
 
         int expiration = exp - iat;
 
-        Cookie cookie = new Cookie(tokenType, token);
-        cookie.setPath(path);
-        cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
-        cookie.setMaxAge(expiration);
+        ResponseCookie cookie = ResponseCookie.from(tokenType, token)
+                .path(path)
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(expiration)
+                .sameSite("None")
+                .build();
 
         return cookie;
     }

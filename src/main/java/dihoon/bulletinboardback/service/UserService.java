@@ -8,12 +8,15 @@ import dihoon.bulletinboardback.exception.UserAlreadyExistsException;
 import dihoon.bulletinboardback.repository.UserRepository;
 import dihoon.bulletinboardback.utils.EmailValidator;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +24,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @Service
 public class UserService implements UserDetailsService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -45,11 +49,13 @@ public class UserService implements UserDetailsService {
             throw new UserAlreadyExistsException("User already exists");
         }
 
-        return userRepository.save(User.builder()
+        User user = userRepository.save(User.builder()
                 .email(email)
                 .password(new BCryptPasswordEncoder().encode(password))
                 .role(role)
-                .build()).getUserId();
+                .build());
+
+        return user.getUserId();
     }
 
     public User findByEmail(String email) {

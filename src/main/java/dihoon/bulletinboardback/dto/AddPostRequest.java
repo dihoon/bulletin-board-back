@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @RequiredArgsConstructor
 public class AddPostRequest {
-    private final String title;
-    private final String content;
+    private String title;
+    private String content;
 }

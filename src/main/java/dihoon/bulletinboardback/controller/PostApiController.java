@@ -9,14 +9,21 @@ import dihoon.bulletinboardback.exception.PostNotFoundException;
 import dihoon.bulletinboardback.exception.TitleNotFoundException;
 import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
 import dihoon.bulletinboardback.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
@@ -25,7 +32,7 @@ public class PostApiController implements PostApi {
     private final PostService postService;
 
     @PostMapping("/")
-    public ResponseEntity createPost(AddPostRequest request) {
+    public ResponseEntity createPost(@RequestBody AddPostRequest request) {
         try {
             postService.createPost(request);
         } catch (TitleNotFoundException e) {
@@ -52,7 +59,7 @@ public class PostApiController implements PostApi {
     }
 
     @GetMapping("/")
-    public ResponseEntity getAllPosts(int page, int size, @RequestParam(required = false) String... sort) {
+    public ResponseEntity getAllPosts(@RequestParam int page, @RequestParam int size, @RequestParam(defaultValue = "createdAt:desc") String sort) {
         try {
             Page<Post> posts = postService.getAllPosts(page, size, sort);
             ApiResponse response = new ApiResponse("Posts retrieved successfully", posts);
@@ -89,4 +96,5 @@ public class PostApiController implements PostApi {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
 }

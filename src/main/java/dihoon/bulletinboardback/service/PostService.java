@@ -18,8 +18,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -54,9 +56,21 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> getAllPosts(int page, int size, String... sort) {
-        Sort criteria = Sort.by(parseSort(sort != null ? sort : new String[]{"createdAt,desc"}));
-        Pageable pageable = PageRequest.of(page, size, criteria);
+    public Page<Post> getAllPosts(int page, int size, String sortString) {
+
+        List<Sort.Order> orders = new ArrayList<>();
+
+        String[] sortArray = sortString.split(",");
+        for (String s : sortArray) {
+            String[] sortParts = s.split(":");
+            String field = sortParts[0];
+            String order = sortParts.length > 1 ? sortParts[1] : "asc";
+            orders.add(new Sort.Order(Sort.Direction.fromString(order), field));
+        }
+
+        Sort sort = Sort.by(orders);
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         return postRepository.findAll(pageable);
     }

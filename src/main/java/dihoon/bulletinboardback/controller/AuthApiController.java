@@ -13,7 +13,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,7 +39,7 @@ public class AuthApiController implements AuthApi {
     private final UserService userService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(AddUserRequest request) {
+    public ResponseEntity signUp(@RequestBody AddUserRequest request) {
         try {
             userService.save(request);
         } catch (InvalidEmailException e) {
@@ -67,9 +70,9 @@ public class AuthApiController implements AuthApi {
 
             userService.updateRefreshToken(email, refreshToken);
 
-            Cookie refreshTokenCookie = tokenProvider.generateCookie(refreshToken, tokenProvider.getRefreshSecretKey(), "/api/auth");
+            ResponseCookie refreshTokenCookie = tokenProvider.generateCookie(refreshToken, tokenProvider.getRefreshSecretKey(), "/api/auth");
 
-            response.addCookie(refreshTokenCookie);
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
             return ResponseEntity.status(HttpStatus.OK).body(loginResponse);
         } catch (AuthenticationException e) {
