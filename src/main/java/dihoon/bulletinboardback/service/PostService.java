@@ -5,6 +5,7 @@ import dihoon.bulletinboardback.domain.User;
 import dihoon.bulletinboardback.dto.AddPostRequest;
 import dihoon.bulletinboardback.dto.PostDto;
 import dihoon.bulletinboardback.dto.UpdatePostRequest;
+import dihoon.bulletinboardback.exception.InvalidTitleException;
 import dihoon.bulletinboardback.exception.PostNotFoundException;
 import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
 import dihoon.bulletinboardback.repository.PostRepository;
@@ -57,7 +58,11 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<Post> getAllPosts(int page, int size, String sortString) {
+        Pageable pageable = getPageable(page, size, sortString);
+        return postRepository.findAll(pageable);
+    }
 
+    private Pageable getPageable(int page, int size, String sortString) {
         List<Sort.Order> orders = new ArrayList<>();
 
         String[] sortArray = sortString.split(",");
@@ -69,10 +74,7 @@ public class PostService {
         }
 
         Sort sort = Sort.by(orders);
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        return postRepository.findAll(pageable);
+        return PageRequest.of(page, size, sort);
     }
 
     private List<Sort.Order> parseSort(String[] sort) {
@@ -98,6 +100,9 @@ public class PostService {
 
         Post post = getPostById(postId);
 
+        if (updateData.getTitle() == null) throw new InvalidTitleException("Title is missing");
+
+        post.setTitle(updateData.getTitle());
         post.setContent(updateData.getContent());
         postRepository.save(post);
         return post;
@@ -136,5 +141,22 @@ public class PostService {
                 .userId(post.getUser().getUserId())
                 .userEmail(post.getUser().getEmail())
                 .build();
+    }
+
+    @Transactional
+    public Page<Post> getPostByUser(int page, int size, String sortString) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        long userId = user.getUserId();
+
+        Pageable pageable = getPageable(page, size, sortString);
+
+        Page<Post> posts = postRepository.findAllByUser_UserId(userId, pageable);
+
+        return posts;
     }
 }

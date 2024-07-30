@@ -6,6 +6,7 @@ import dihoon.bulletinboardback.dto.AddPostRequest;
 import dihoon.bulletinboardback.dto.ApiResponse;
 import dihoon.bulletinboardback.dto.PostDto;
 import dihoon.bulletinboardback.dto.UpdatePostRequest;
+import dihoon.bulletinboardback.exception.InvalidTitleException;
 import dihoon.bulletinboardback.exception.PostNotFoundException;
 import dihoon.bulletinboardback.exception.TitleNotFoundException;
 import dihoon.bulletinboardback.exception.UnauthorizedAccessException;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostApiController implements PostApi {
     private final PostService postService;
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity createPost(@RequestBody AddPostRequest request) {
         try {
             postService.createPost(request);
@@ -67,6 +68,8 @@ public class PostApiController implements PostApi {
             Post post = postService.updatePost(postId, request);
             ApiResponse response = new ApiResponse("Post updated successfully", post);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (InvalidTitleException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

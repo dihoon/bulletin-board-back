@@ -70,7 +70,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     }
 
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        LoginResponse loginResponse = new LoginResponse(false, failed.getMessage(), null);
+        LoginResponse loginResponse = new LoginResponse(false, failed.getMessage(), null, null);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

@@ -13,4 +13,5 @@ public class LoginResponse {
     private final boolean success;
     private final String message;
     private String token;
+    private String email;
 }

@@ -9,7 +9,6 @@ import dihoon.bulletinboardback.exception.InvalidEmailException;
 import dihoon.bulletinboardback.exception.UserAlreadyExistsException;
 import dihoon.bulletinboardback.jwt.TokenProvider;
 import dihoon.bulletinboardback.service.UserService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +22,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +60,7 @@ public class AuthApiController implements AuthApi {
 
             String message = "Login Successful";
 
-            LoginResponse loginResponse = new LoginResponse(true, message, accessToken);
+            LoginResponse loginResponse = new LoginResponse(true, message, accessToken, email);
 
             String refreshToken = tokenProvider.generateRefreshToken(email);
 
@@ -76,10 +72,10 @@ public class AuthApiController implements AuthApi {
 
             return ResponseEntity.status(HttpStatus.OK).body(loginResponse);
         } catch (AuthenticationException e) {
-            LoginResponse loginResponse = new LoginResponse(false, e.getMessage(), null);
+            LoginResponse loginResponse = new LoginResponse(false, e.getMessage(), null, null);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(loginResponse);
         } catch (Exception e) {
-            LoginResponse loginResponse = new LoginResponse(false, e.getMessage(), null);
+            LoginResponse loginResponse = new LoginResponse(false, e.getMessage(), null, null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(loginResponse);
         }
     }
@@ -87,6 +83,18 @@ public class AuthApiController implements AuthApi {
     @PostMapping("/logout")
     public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) {
         return ResponseEntity.status(HttpStatus.OK).body("Logout Successful");
+    }
+
+    @DeleteMapping()
+    public ResponseEntity deleteAccount(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            userService.deleteByUserId();
+            return new ResponseEntity("User deleted successfully", HttpStatus.OK);
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/refresh")
@@ -111,7 +119,8 @@ public class AuthApiController implements AuthApi {
                     ObjectMapper objectMapper = new ObjectMapper();
 
                     Map<String, String> map = new HashMap<>();
-                    map.put("accessToken", newAccessToken);
+                    map.put("email", email);
+                    map.put("token", newAccessToken);
 
                     String response = objectMapper.writeValueAsString(map);
 

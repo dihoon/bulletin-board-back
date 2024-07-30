@@ -17,10 +17,11 @@ public class Post {
     @Column(unique = true, nullable = false)
     private long postId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String title;
 
-    @Column()
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(nullable = false,  updatable = false, scale = 0)

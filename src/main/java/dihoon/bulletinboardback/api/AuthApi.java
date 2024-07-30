@@ -46,4 +46,7 @@ public interface AuthApi {
 
     @Operation(summary = "로그아웃", security = { @SecurityRequirement(name = "accessToken")})
     ResponseEntity logout(HttpServletRequest request, HttpServletResponse response);
+
+    @Operation(summary = "회원탈퇴", security = { @SecurityRequirement(name = "accessToken")})
+    ResponseEntity deleteAccount(HttpServletRequest request, HttpServletResponse response);
 }
