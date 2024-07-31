@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.TimeZone;
+
 @SpringBootApplication
 public class BulletinBoardBackApplication {
 
@@ -14,6 +16,8 @@ public class BulletinBoardBackApplication {
     private String[] allowedOrigins;
 
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT+09:00"));
+
         SpringApplication.run(BulletinBoardBackApplication.class, args);
     }
 
